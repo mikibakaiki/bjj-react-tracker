@@ -6,5 +6,5 @@ interface Kimono {
   discount: number[];
   img?: string;
   url: string;
-  timestamp: Date[];
+  timestamp: string[];
 }
