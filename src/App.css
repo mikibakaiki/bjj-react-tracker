@@ -14,7 +14,7 @@ h1 {
 }
 
 /* App.css or a separate CSS file for grid layout */
-.kimono-cards {
+.kimono-card-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   grid-gap: 20px;
@@ -22,7 +22,7 @@ h1 {
 }
 
 @media (max-width: 600px) {
-  .kimono-cards {
+  .kimono-card-list {
     grid-template-columns: 1fr;
   }
 }

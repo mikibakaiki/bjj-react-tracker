@@ -1,5 +1,4 @@
 import React from "react";
-import { Kimono } from "../types"; // Import the Kimono interface
 import "./KimonoCard.css";
 
 interface KimonoCardProps {
