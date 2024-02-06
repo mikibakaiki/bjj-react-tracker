@@ -22,15 +22,23 @@ function App() {
     const fetchMoreKimonos = async () => {
       setIsLoading(true);
       try {
-        const data = await getKimonos<Kimono[]>('kimonos', page, 20);
+        const data = await getKimonos<Kimono[]>('kimonos', page, 20, searchQuery);
         if (data.length < 20) {
           setHasMoreKimonos(false); // When there are no more items to fetch
+        } else {
+          // this has to be here, otherwise, when clearing the search, the flag is never set
+          setHasMoreKimonos(true);
         }
-        setKimonos(prevKimonos => {
-          // remove the existing ones, through the id
-          const newKimonos = data.filter(kimono => !prevKimonos.some(pk => pk._id === kimono._id));
-          return [...prevKimonos, ...newKimonos];
-        });
+        if (page === 1) {
+          setKimonos(data);
+        } else {
+          setKimonos(prevKimonos => [...prevKimonos, ...data]);
+        }
+        // setKimonos(prevKimonos => {
+        //   // remove the existing ones, through the id
+        //   const newKimonos = data.filter(kimono => !prevKimonos.some(pk => pk._id === kimono._id));
+        //   return [...prevKimonos, ...newKimonos];
+        // });
       } catch (error) {
         console.error('Failed to fetch data:', error);
       } finally {
@@ -38,7 +46,7 @@ function App() {
       }
     }
     fetchMoreKimonos();
-  }, [page]);
+  }, [page, searchQuery]);
 
   const loadMoreItems = () => {
     if (!isLoading && hasMoreKimonos) {
@@ -79,6 +87,7 @@ function App() {
   // Function to handle search input change
   const handleSearchChange = (value: string) => {
     setSearchQuery(value);
+    setPage(1);
   };
 
   return (
@@ -92,7 +101,7 @@ function App() {
       </header>
       {/* Kimono Cards */}
       <div className="kimono-card-list">
-        {kimonos.map((kimono) => (
+        {filteredKimonos.map((kimono) => (
           <KimonoCard
             key={kimono._id}
             kimono={kimono}
