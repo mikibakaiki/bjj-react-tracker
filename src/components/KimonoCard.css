@@ -8,6 +8,9 @@
   padding: 10px;
   cursor: pointer;
   transition: transform 0.2s ease-in-out;
+  position: relative;
+  overflow: hidden;
+  min-height: 400px;
 }
 
 .kimono-card:hover {
@@ -29,4 +32,24 @@
   margin: 10px 0;
 }
 
-/* Add more styles for price, date, and discount here */
+@keyframes shimmer {
+  0% {
+    background-position: -468px 0;
+  }
+  100% {
+    background-position: 468px 0;
+  }
+}
+
+.shimmer {
+  animation: shimmer 1.5s infinite linear;
+  background: #f6f7f8;
+  background: linear-gradient(to right, #eeeeee 8%, #dddddd 18%, #eeeeee 33%);
+  background-size: 1000px 100%;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1; /* Make sure it overlays the content; adjust as necessary */
+}

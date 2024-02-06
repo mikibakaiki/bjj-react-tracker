@@ -34,11 +34,6 @@ function App() {
         } else {
           setKimonos(prevKimonos => [...prevKimonos, ...data]);
         }
-        // setKimonos(prevKimonos => {
-        //   // remove the existing ones, through the id
-        //   const newKimonos = data.filter(kimono => !prevKimonos.some(pk => pk._id === kimono._id));
-        //   return [...prevKimonos, ...newKimonos];
-        // });
       } catch (error) {
         console.error('Failed to fetch data:', error);
       } finally {
