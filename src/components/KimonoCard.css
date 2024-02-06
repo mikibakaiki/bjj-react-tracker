@@ -18,6 +18,8 @@
   max-width: 100%;
   height: auto;
   border-radius: 5px;
+  max-height: 200px; /* Set a maximum height */
+  object-fit: cover; /* Ensure the image covers the area without stretching */
 }
 
 .kimono-card h3 {

@@ -13,4 +13,18 @@ h1 {
   margin: 20px 0;
 }
 
+/* App.css or a separate CSS file for grid layout */
+.kimono-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-gap: 20px;
+  padding: 20px;
+}
+
+@media (max-width: 600px) {
+  .kimono-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Add more global styles as needed */

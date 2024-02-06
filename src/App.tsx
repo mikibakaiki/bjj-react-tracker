@@ -10,17 +10,34 @@ function App() {
   const [kimonos, setKimonos] = useState<Kimono[]>([]); // State to store kimono data
   const [selectedKimono, setSelectedKimono] = useState<Kimono | null>(null); // State for selected kimono
   const [searchQuery, setSearchQuery] = useState<string>(""); // State for search query
-  const [currentPage, setCurrentPage] = useState<number>(1); // State for current page
-  const [kimonosPerPage] = useState<number>(10); // Number of kimonos to display per page
+  // const [currentPage, setCurrentPage] = useState<number>(1); // State for current page
+  // const [kimonosPerPage] = useState<number>(10); // Number of kimonos to display per page
+  const [isLoading, setIsLoading] = useState(false);
+  const [page, setPage] = useState(1);
 
   // Fetch kimono data from the API and update the kimonos state
   useEffect(() => {
-    // Make an API request here and update the kimonos state
-    // Example: fetch('your_api_endpoint_here')
-    //   .then((response) => response.json())
-    //   .then((data) => setKimonos(data))
-    //   .catch((error) => console.error('Error fetching data:', error));
-    setKimonos(getKimonoList);
+    const fetchMoreKimonos = async () => {
+      setIsLoading(true);
+      // Fetch next set of kimonos based on the page number
+      // Append them to the existing kimonos list
+      setIsLoading(false);
+    };
+    fetchMoreKimonos();
+  }, [page]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (
+        window.innerHeight + document.documentElement.scrollTop !==
+        document.documentElement.offsetHeight
+      )
+        return;
+      setPage((prevPage) => prevPage + 1);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   // Filter kimonos based on search query
@@ -30,24 +47,9 @@ function App() {
       kimono.price.some((price) => price.toString().includes(searchQuery)),
   );
 
-  // Calculate the index of the last kimono to display on the current page
-  const indexOfLastKimono = currentPage * kimonosPerPage;
-  // Calculate the index of the first kimono to display on the current page
-  const indexOfFirstKimono = indexOfLastKimono - kimonosPerPage;
-  // Get the kimonos to display on the current page
-  const currentKimonos = filteredKimonos.slice(
-    indexOfFirstKimono,
-    indexOfLastKimono,
-  );
-
   // Function to handle kimono card click and display price history
   const handleKimonoCardClick = (kimono: Kimono) => {
     setSelectedKimono(kimono);
-  };
-
-  // Function to handle pagination page change
-  const handlePageChange = (pageNumber: number) => {
-    setCurrentPage(pageNumber);
   };
 
   // Function to handle search input change
@@ -66,7 +68,7 @@ function App() {
       </header>
       {/* Kimono Cards */}
       <div className="kimono-cards">
-        {currentKimonos.map((kimono) => (
+        {kimonos.map((kimono) => (
           <KimonoCard
             key={kimono._id}
             kimono={kimono}
@@ -74,15 +76,7 @@ function App() {
           />
         ))}
       </div>
-      {/* Pagination */}
-      <div className="pagination">
-        <Pagination
-          itemsPerPage={kimonosPerPage}
-          totalItems={filteredKimonos.length}
-          currentPage={currentPage}
-          onPageChange={handlePageChange}
-        />
-      </div>
+      {isLoading && <div>Loading more kimonos...</div>}
       {/* Kimono Price History */}
       {selectedKimono && (
         <KimonoGraph
