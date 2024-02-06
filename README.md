@@ -6,6 +6,11 @@ This is a [Vite](https://vitejs.dev) project together with React.
 
 [Configuration](https://codesandbox.io/docs/projects/learn/setting-up/tasks) `.codesandbox/tasks.json` has been added to optimize it for [CodeSandbox](https://codesandbox.io/dashboard).
 
+## SETUP
+Create a `.env` file and write the API base url, like:
+
+`VITE_REACT_APP_API_BASE_URL=http://localhost:3000`
+
 ## Resources
 
 - [CodeSandbox — Docs](https://codesandbox.io/docs/learn)
