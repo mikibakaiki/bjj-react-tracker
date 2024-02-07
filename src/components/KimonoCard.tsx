@@ -13,10 +13,10 @@ const KimonoCard: React.FC<KimonoCardProps> = ({ kimono, onClick}) => {
 
   // Simulate loading completion. You would replace this with actual loading logic.
   React.useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 1500); // Simulate a fetch time
+    const timer = setTimeout(() => setIsLoading(false), 800); // Simulate a fetch time
     return () => clearTimeout(timer);
   }, []);
-  
+
   return (
     <div className="kimono-card" onClick={() => onClick(kimono)}>
       {isLoading ? (
