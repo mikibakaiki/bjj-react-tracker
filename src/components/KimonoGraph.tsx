@@ -1,5 +1,4 @@
 import React from "react";
-import { Kimono } from "../types"; // Import the Kimono interface
 import {
   LineChart,
   Line,
@@ -9,6 +8,9 @@ import {
   Tooltip,
   Legend,
 } from "recharts"; // You may need to install the 'recharts' library
+import "./KimonoGraph.css";
+import { DateTime } from "luxon";
+
 
 interface KimonoGraphProps {
   kimono: Kimono;
@@ -18,8 +20,7 @@ interface KimonoGraphProps {
 const KimonoGraph: React.FC<KimonoGraphProps> = ({ kimono, onClose }) => {
   return (
     <div className="kimono-graph">
-      <button onClick={onClose}>Close</button>
-      <h2>Price History Graph for {kimono.name}</h2>
+      <h2>Price History for {kimono.name}</h2>
       <LineChart
         width={400}
         height={300}
@@ -28,14 +29,16 @@ const KimonoGraph: React.FC<KimonoGraphProps> = ({ kimono, onClose }) => {
           price,
         }))}
       >
-        <XAxis dataKey="date" />
+        <XAxis dataKey="date" tickFormatter={(tickItem) => DateTime.fromISO(tickItem).toFormat('dd/MM/yyyy')} />
+        <Tooltip labelFormatter={(label) => DateTime.fromISO(label).toFormat('dd/MM/yyyy')} />
         <YAxis />
         <CartesianGrid strokeDasharray="3 3" />
-        <Tooltip />
         <Legend />
         <Line type="monotone" dataKey="price" stroke="#8884d8" />
       </LineChart>
+      <button onClick={onClose}>Close</button>
     </div>
+
   );
 };
 

@@ -107,10 +107,15 @@ function App() {
       {isLoading && <div>Loading more kimonos...</div>}
       {/* Kimono Price History */}
       {selectedKimono && (
-        <KimonoGraph
-          kimono={selectedKimono}
-          onClose={() => setSelectedKimono(null)}
-        />
+        <>
+          <div className="kimono-graph-overlay" onClick={() => setSelectedKimono(null)}></div>
+          <div className="kimono-graph-modal">
+            <KimonoGraph
+              kimono={selectedKimono}
+              onClose={() => setSelectedKimono(null)}
+            />
+          </div>
+        </>
       )}
     </div>
   );
