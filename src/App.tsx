@@ -5,6 +5,8 @@ import SearchBar from "./components/SearchBar"; // Create a KimonoGraph componen
 import "./App.css";
 import { debounce } from 'lodash';
 import { getKimonos } from "./services/api.service";
+import { DateTime } from "luxon";
+import { Kimono } from "./types";
 
 function App() {
   const [kimonos, setKimonos] = useState<Kimono[]>([]); // State to store kimono data
@@ -14,6 +16,15 @@ function App() {
   const [page, setPage] = useState(1);
   const [hasMoreKimonos, setHasMoreKimonos] = useState(true);
 
+
+  const preprocessKimonosDates = (kimonos: Kimono[]) => {
+    return kimonos.map((kimono) => {
+      const formattedDates = kimono.timestamp.map((timestampString) => {
+        return DateTime.fromISO(timestampString).toFormat('dd/MM/yyyy');
+      });
+      return { ...kimono, timestamp: formattedDates };
+    });
+  };
 
   // Fetch kimono data from the API and update the kimonos state
   useEffect(() => {
@@ -30,9 +41,9 @@ function App() {
           setHasMoreKimonos(true);
         }
         if (page === 1) {
-          setKimonos(data);
+          setKimonos(preprocessKimonosDates(data));
         } else {
-          setKimonos(prevKimonos => [...prevKimonos, ...data]);
+          setKimonos(prevKimonos => [...prevKimonos, ...preprocessKimonosDates(data)]);
         }
       } catch (error) {
         console.error('Failed to fetch data:', error);

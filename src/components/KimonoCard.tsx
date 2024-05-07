@@ -1,10 +1,10 @@
 import React from "react";
 import "./KimonoCard.css";
+import { Kimono } from "../types";
 
 interface KimonoCardProps {
   kimono: Kimono;
   onClick: (kimono: Kimono) => void;
-  //isLoading: boolean;
 }
 
 const KimonoCard: React.FC<KimonoCardProps> = ({ kimono, onClick}) => {

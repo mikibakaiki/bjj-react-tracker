@@ -1,4 +1,4 @@
-interface Kimono {
+export interface Kimono {
   _id: string;
   name: string;
   price: number[];
