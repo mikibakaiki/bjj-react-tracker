@@ -7,7 +7,7 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
-} from "recharts"; // You may need to install the 'recharts' library
+} from "recharts";
 import "./KimonoGraph.css";
 import { DateTime } from "luxon";
 import { Kimono } from "../types";
@@ -18,11 +18,16 @@ interface KimonoGraphProps {
   onClose: () => void;
 }
 
+interface DataPoint {
+  date: string;
+  price: number;
+}
+
 const KimonoGraph: React.FC<KimonoGraphProps> = ({ kimono, onClose }) => {
 
   const [selectedPeriod, setSelectedPeriod] = useState('all');
 
-  const filterDataByPeriod = (data: {timestamp: string, price: number}, period: string): string[] => {
+  const filterDataByPeriod = (data: DataPoint[], period: string): DataPoint[] => {
     const now = DateTime.now();
     let startDate: DateTime;
   
@@ -41,44 +46,73 @@ const KimonoGraph: React.FC<KimonoGraphProps> = ({ kimono, onClose }) => {
         return data; // No filtering needed
     }
   
-    return data.filter((timestamp: string) => {
-      const dateTime = DateTime.fromFormat(timestamp, 'dd/MM/yyyy');
+    return data.filter(({date}) => {
+      const dateTime = DateTime.fromFormat(date, 'dd/MM/yyyy');
       return dateTime >= startDate;
     });
   };
 
-  const preparedData = kimono.timestamp.map((timestamp, index) => ({
+  const preparedData: DataPoint[] = kimono.timestamp.map((timestamp, index) => ({
     date: timestamp,
     price: kimono.price[index],
   }));
 
   const filteredData = filterDataByPeriod(preparedData, selectedPeriod);
 
+  const calculateExtremes = (data: DataPoint[]) => {
+    return data.map(d => ({
+      ...d,
+      minPrice: Math.min(...kimono.price),
+      maxPrice: Math.max(...kimono.price)
+    }));
+  };
+  
+  const extremeData = calculateExtremes(filteredData);
 
   return (
     <div className="kimono-graph">
       <h2>Price History for {kimono.name}</h2>
-      <LineChart
-        width={400}
-        height={300}
-        data={filteredData}
-      >
-        <XAxis dataKey="date" />
-        <Tooltip />
+      <div className="timeframe-pills">
+        {["all", "1year", "6months", "3months"].map((period) => (
+          <button
+            key={period}
+            className={`pill ${selectedPeriod === period ? "active" : ""}`}
+            onClick={() => setSelectedPeriod(period)}
+          >
+            {period === "1year"
+              ? "Last Year"
+              : period === "6months"
+              ? "Last 6 Months"
+              : period === "3months"
+              ? "Last 3 Months"
+              : "All"}
+          </button>
+        ))}
+      </div>
+      <LineChart width={window.innerWidth < 768 ? 300 : 700} height={window.innerWidth < 768 ? 200 : 400} data={extremeData}>
+        <XAxis
+          dataKey="date"
+          tickFormatter={(dateStr) =>
+            DateTime.fromFormat(dateStr, "dd/MM/yyyy").toFormat("dd LLL")
+          }
+        />
+        <Tooltip
+          formatter={(value) => `${Number(value).toFixed(2)}€`}
+          labelFormatter={(label) =>
+            DateTime.fromFormat(label, "dd/MM/yyyy").toFormat("dd LLL yyyy")
+          }
+        />
         <YAxis />
         <CartesianGrid strokeDasharray="3 3" />
         <Legend />
-        <Line type="monotone" dataKey="price" stroke="#8884d8" />
+        <Line type="monotone" dataKey="price" stroke="#8884d8" dot={false} />
+        <Line type="monotone" dataKey="minPrice" stroke="#82ca9d" dot={false} />
+        <Line type="monotone" dataKey="maxPrice" stroke="#FF6347" dot={false} />
       </LineChart>
-      <select value={selectedPeriod} onChange={(e) => setSelectedPeriod(e.target.value)}>
-        <option value="all">All</option>
-        <option value="3months">Last 3 Months</option>
-        <option value="6months">Last 6 Months</option>
-        <option value="1year">Last Year</option>
-      </select>
-      <button onClick={onClose}>Close</button>
+      <button className="close-btn" onClick={onClose}>
+        Close
+      </button>
     </div>
-
   );
 };
 
