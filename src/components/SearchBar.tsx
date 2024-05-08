@@ -12,7 +12,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ value, onChange }) => {
   };
 
   return (
-    <input
+    <input className="search-bar"
       type="text"
       placeholder="Search by name or price"
       value={value}

@@ -89,26 +89,44 @@ const KimonoGraph: React.FC<KimonoGraphProps> = ({ kimono, onClose }) => {
           </button>
         ))}
       </div>
-      <LineChart width={window.innerWidth < 768 ? 300 : 700} height={window.innerWidth < 768 ? 200 : 400} data={extremeData}>
-        <XAxis
-          dataKey="date"
-          tickFormatter={(dateStr) =>
-            DateTime.fromFormat(dateStr, "dd/MM/yyyy").toFormat("dd LLL")
-          }
-        />
-        <Tooltip
-          formatter={(value) => `${Number(value).toFixed(2)}€`}
-          labelFormatter={(label) =>
-            DateTime.fromFormat(label, "dd/MM/yyyy").toFormat("dd LLL yyyy")
-          }
-        />
-        <YAxis />
-        <CartesianGrid strokeDasharray="3 3" />
-        <Legend />
-        <Line type="monotone" dataKey="price" stroke="#8884d8" dot={false} />
-        <Line type="monotone" dataKey="minPrice" stroke="#82ca9d" dot={false} />
-        <Line type="monotone" dataKey="maxPrice" stroke="#FF6347" dot={false} />
-      </LineChart>
+      <div className="chart-container">
+        <LineChart
+          width={window.innerWidth < 768 ? 300 : 700}
+          height={window.innerWidth < 768 ? 200 : 400}
+          data={extremeData}
+        >
+          <XAxis
+            dataKey="date"
+            tickFormatter={(dateStr) =>
+              DateTime.fromFormat(dateStr, "dd/MM/yyyy").toFormat("dd LLL")
+            }
+          />
+          <Tooltip
+            formatter={(value) => `${Number(value).toFixed(2)}€`}
+            labelFormatter={(label) =>
+              DateTime.fromFormat(label, "dd/MM/yyyy").toFormat("dd LLL yyyy")
+            }
+          />
+          <YAxis />
+          <CartesianGrid strokeDasharray="3 3" />
+          <Legend />
+          <Line type="monotone" dataKey="price" stroke="#8884d8" dot={false} />
+          <Line
+            type="monotone"
+            name="Min Price"
+            dataKey="minPrice"
+            stroke="#82ca9d"
+            dot={false}
+          />
+          <Line
+            type="monotone"
+            name="Max Price"
+            dataKey="maxPrice"
+            stroke="#FF6347"
+            dot={false}
+          />
+        </LineChart>
+      </div>
       <button className="close-btn" onClick={onClose}>
         Close
       </button>

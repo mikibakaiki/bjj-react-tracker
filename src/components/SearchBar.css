@@ -10,4 +10,21 @@ input[type="text"] {
   outline: none;
 }
 
+/* .search-bar {
+  display: block;
+  width: 50%;
+  margin: 0 auto;
+  padding: 10px 20px;
+  font-size: 1.2em;
+  color: #333;
+  border: 2px solid #ccc;
+  border-radius: 10px;
+  outline: none;
+  transition: border-color 0.3s ease-out;
+}
+
+.search-bar:focus {
+  border-color: #5a5ad8;
+} */
+
 /* Customize the search input's appearance as needed */

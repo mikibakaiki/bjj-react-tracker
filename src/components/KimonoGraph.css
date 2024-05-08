@@ -1,16 +1,40 @@
+.kimono-graph {
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 15px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.kimono-graph h2 {
+    margin-bottom: 20px;
+}
+
+.timeframe-pills {
+    justify-content: center;
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.chart-container {
+    width: 100%;
+    display: flex;
+    justify-content: center; /* Centers the chart if it's smaller than the container */
+}
+
 .close-btn {
-    position: absolute;
-    right: 20px;
-    bottom: 20px;
-    padding: 10px 20px;
     background-color: red;
     color: white;
     border: none;
+    padding: 10px 20px;
     border-radius: 10px;
     cursor: pointer;
-  }
+    margin-top: 20px; /* Spacing after the chart */
+    align-self: center; /* Center button under the chart */
+}
 
-  .pill {
+.pill {
     padding: 8px 16px;
     margin: 0 5px;
     background-color: #5a5ad8;
@@ -20,22 +44,14 @@
     cursor: pointer;
     transition: background-color 0.3s, transform 0.2s;
     outline: none;
-  }
-  
-  .pill:hover {
+}
+
+.pill:hover {
     background-color: #6a6afe;
     transform: translateY(-2px);
-  }
-  
-  .pill.active {
+}
+
+.pill.active {
     background-color: #8884d8;
     box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-  }
-
-.kimono-graph {
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 15px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
-  

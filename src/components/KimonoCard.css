@@ -1,5 +1,5 @@
 /* KimonoCard.css */
-.kimono-card {
+/* .kimono-card {
   background-color: #fff;
   border: 1px solid #e0e0e0;
   border-radius: 5px;
@@ -11,26 +11,25 @@
   position: relative;
   overflow: hidden;
   min-height: 400px;
-}
+} */
 
-.kimono-card:hover {
+/* .kimono-card:hover {
   transform: scale(1.05);
-}
+} */
 
 .kimono-card img {
-  max-width: 100%;
-  height: auto;
+  width: 100%;
   border-radius: 5px;
-  max-height: 200px; /* Set a maximum height */
-  object-fit: cover; /* Ensure the image covers the area without stretching */
+  height: auto;
+  object-fit: cover;
 }
 
-.kimono-card h3 {
+/* .kimono-card h3 {
   font-size: 18px;
   font-weight: bold;
   color: #333;
   margin: 10px 0;
-}
+} */
 
 @keyframes shimmer {
   0% {
@@ -52,4 +51,49 @@
   top: 0;
   left: 0;
   z-index: 1; /* Make sure it overlays the content; adjust as necessary */
+}
+
+
+.kimono-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* Aligns content spaced out evenly */
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.2s ease-in-out;
+}
+
+.kimono-card:hover {
+  transform: scale(1.05);
+}
+
+/* .kimono-card img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+}
+*/
+
+.kimono-card-details {
+  padding: 10px;
+  text-align: center;
+}
+
+.kimono-card-title {
+  font-size: 1rem;
+  color: #333;
+}
+
+.kimono-card-price {
+  font-size: 1.2rem;
+  color: #000;
+  font-weight: bold;
+}
+
+.kimono-card-meta {
+  font-size: 0.9rem;
+  color: #666;
+  margin-top: 5px;
 }

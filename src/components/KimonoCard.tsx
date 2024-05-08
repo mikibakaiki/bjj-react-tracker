@@ -24,10 +24,12 @@ const KimonoCard: React.FC<KimonoCardProps> = ({ kimono, onClick}) => {
       ) : (
       <>
         <img src={kimono.img} alt={kimono.name} />
-        <h3>{kimono.name}</h3>
-        <p>Latest Price: {kimono.price[kimono.price.length - 1]}€</p>
-        <p>Last Update: {kimono.timestamp[kimono.timestamp.length - 1]}</p>
-        <p>Discount: {kimono.discount[kimono.discount.length - 1]}%</p>
+        <div className="kimono-card-details">
+          <div className="kimono-card-title">{kimono.name}</div>
+          <div className="kimono-card-price">Latest Price: {kimono.price[kimono.price.length - 1]}€</div>
+          <div className="kimono-card-meta">Last Update: {kimono.timestamp[kimono.timestamp.length - 1]}</div>
+          <div className="kimono-card-meta">Discount: {kimono.discount[kimono.discount.length - 1]}%</div>
+        </div>
       </>
     )}
     </div>
