@@ -7,3 +7,18 @@ button {
     border-radius: 8px;
     margin-top: 20px;
 }
+
+.pill {
+    padding: 8px 16px;
+    margin: 5px;
+    border: none;
+    border-radius: 15px;
+    background-color: #8884d8;
+    color: white;
+    cursor: pointer;
+    outline: none;
+  }
+  
+  .pill.active {
+    background-color: #5a5ad8;
+  }
