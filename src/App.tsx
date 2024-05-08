@@ -7,6 +7,7 @@ import { debounce } from 'lodash';
 import { getKimonos } from "./services/api.service";
 import { DateTime } from "luxon";
 import { Kimono } from "./types";
+import Modal from "./components/Modal";
 
 function App() {
   const [kimonos, setKimonos] = useState<Kimono[]>([]); // State to store kimono data
@@ -118,15 +119,12 @@ function App() {
       {isLoading && <div>Loading more kimonos...</div>}
       {/* Kimono Price History */}
       {selectedKimono && (
-        <>
-          <div className="kimono-graph-overlay" onClick={() => setSelectedKimono(null)}></div>
-          <div className="kimono-graph-modal">
-            <KimonoGraph
+        <Modal onClose={() => setSelectedKimono(null)}>
+          <KimonoGraph
               kimono={selectedKimono}
               onClose={() => setSelectedKimono(null)}
             />
-          </div>
-        </>
+        </Modal>
       )}
     </div>
   );

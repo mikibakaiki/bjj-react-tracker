@@ -13,7 +13,6 @@ h1 {
   margin: 20px 0;
 }
 
-/* App.css or a separate CSS file for grid layout */
 .kimono-card-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -26,33 +25,3 @@ h1 {
     grid-template-columns: 1fr;
   }
 }
-
-.kimono-graph-modal {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 80%;
-  max-width: 600px;
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-  z-index: 1000;
-}
-
-.kimono-graph-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.5);
-  z-index: 999;
-}
-
-/* Add more global styles as needed */
