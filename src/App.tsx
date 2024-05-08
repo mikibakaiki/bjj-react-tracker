@@ -16,6 +16,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMoreKimonos, setHasMoreKimonos] = useState(true);
+  const [prevSearchQuery, setPrevSearchQuery] = useState<string | null>(null);
 
 
   const preprocessKimonosDates = (kimonos: Kimono[]) => {
@@ -41,11 +42,12 @@ function App() {
           // this has to be here, otherwise, when clearing the search, the flag is never set
           setHasMoreKimonos(true);
         }
-        if (page === 1) {
+        if (searchQuery !== prevSearchQuery || page === 1) {
           setKimonos(preprocessKimonosDates(data));
         } else {
           setKimonos(prevKimonos => [...prevKimonos, ...preprocessKimonosDates(data)]);
         }
+        setPrevSearchQuery(searchQuery);
       } catch (error) {
         console.error('Failed to fetch data:', error);
       } finally {
@@ -101,7 +103,7 @@ function App() {
     <div className="App">
       {/* Header */}
       <header>
-        <h1>Brazilian Jiu-Jitsu Kimonos</h1>
+        <div className="header-title">Brazilian Jiu-Jitsu Kimonos</div>
         {/* Search bar and filter options */}
         {/* Search bar */}
         <SearchBar value={searchQuery} onChange={handleSearchChange} />
