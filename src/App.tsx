@@ -96,10 +96,11 @@ function App() {
       <header>
         <div className="header-title">Brazilian Jiu-Jitsu Kimonos</div>
         {/* Search bar and filter options */}
-        <SearchBar value={searchQuery} onChange={handleSearchChange} />
+        <div className="search-bar-container">
+          <SearchBar value={searchQuery} onChange={handleSearchChange} />
+        </div>
       </header>
       {/* Kimono Cards */}
-      
         <div className="kimono-card-list">
           {kimonos.map((kimono) => (
             <KimonoCard

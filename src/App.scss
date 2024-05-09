@@ -27,3 +27,11 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+/* Improved styling for the search bar to ensure it's centered */
+.search-bar-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px; /* space between search bar and cards */
+}

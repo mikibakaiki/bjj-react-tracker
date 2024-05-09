@@ -1,20 +1,43 @@
-/* SearchBar.css */
-
+/* Styling for the search bar container */
 .search-bar {
-  display: block;
-  width: 50%;
-  margin: 0 auto;
-  padding: 10px 20px;
-  font-size: 1.2em;
-  color: #333;
-  border: 2px solid #ccc;
-  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Ensures space between elements */
+  background-color: #F0F0F0; /* Light grey background */
+  border-radius: 20px;
+  width: 50%; /* Takes up half of the parent width */
+  min-width: 300px; /* Minimum width to ensure usability */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  padding: 8px 15px; /* Ample padding for aesthetics */
+  transition: all 0.3s ease-in-out; /* Smooth transitions for interactions */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .search-bar {
+      width: 100%; /* Full width on smaller screens */
+  }
+}
+
+/* Styling for the input field inside the search bar */
+.search-bar input {
+  flex-grow: 1; /* Allows input to fill available space */
+  background-color: transparent;
+  border: none;
   outline: none;
-  transition: border-color 0.3s ease-out;
+  padding: 10px;
+  font-size: 16px; /* Sufficient size for readability */
+  color: #333; /* Dark color for contrast on light background */
 }
 
-.search-bar:focus {
-  border-color: #5a5ad8;
+/* Styling for icons */
+.search-bar .search-icon, .search-bar .clear-icon {
+  color: #666; /* Medium grey for icons */
+  cursor: pointer;
+  padding: 0 10px; /* Padding around icons for easier interaction */
 }
 
-/* Customize the search input's appearance as needed */
+.search-bar .search-icon:hover, .search-bar .clear-icon:hover {
+  color: #333; /* Darken icons on hover for feedback */
+  transform: scale(1.1); /* Slight enlargement on hover */
+}

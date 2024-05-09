@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "./KimonoCard.css";
 import { Kimono } from "../types";
 
@@ -12,8 +12,8 @@ const KimonoCard: React.FC<KimonoCardProps> = ({ kimono, onClick}) => {
   const [isLoading, setIsLoading] = React.useState(true);
 
   // Simulate loading completion. You would replace this with actual loading logic.
-  React.useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 800); // Simulate a fetch time
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 200); // Simulate a fetch time
     return () => clearTimeout(timer);
   }, []);
 
