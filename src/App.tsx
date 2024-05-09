@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import KimonoCard from "./components/KimonoCard"; // Create a KimonoCard component for displaying kimono details
 import KimonoGraph from "./components/KimonoGraph";
 import SearchBar from "./components/SearchBar"; // Create a KimonoGraph component for displaying price history
-import "./App.css";
+import "./App.scss";
 import { debounce } from 'lodash';
 import { getKimonos } from "./services/api.service";
 import { DateTime } from "luxon";
@@ -16,11 +16,8 @@ function App() {
   const [isLoading, setIsLoading] = useState(false); // State for loading status
   const [page, setPage] = useState(1); // State for pagination
   const [hasMoreKimonos, setHasMoreKimonos] = useState(true); // State for checking if there are more kimonos to fetch
-  const [prevSearchQuery, setPrevSearchQuery] = useState<string | null>(null); // State for previous search query
-  const [inputValue, setInputValue] = useState(""); // State for input value
-  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>(""); // State for debounced search query
   
-  
+
   const preprocessKimonosDates = (kimonos: Kimono[]) => {
     return kimonos.map((kimono) => {
       const formattedDates = kimono.timestamp.map((timestampString) => {
@@ -30,35 +27,28 @@ function App() {
     });
   };
 
-  // Fetch kimono data from the API and update the kimonos state
-  useEffect(() => {
-    // Fetch next set of kimonos based on the page number
-    // Append them to the existing kimonos list
-    const fetchMoreKimonos = async () => {
-      setIsLoading(true);
-      try {
-        const data = await getKimonos<Kimono[]>('kimonos', page, 20, searchQuery);
-        if (data.length < 20) {
-          setHasMoreKimonos(false); // When there are no more items to fetch
-        } else {
-          // this has to be here, otherwise, when clearing the search, the flag is never set
-          setHasMoreKimonos(true);
-        }
-        if (debouncedSearchQuery !== prevSearchQuery || page === 1) {
-          setKimonos(preprocessKimonosDates(data));
-        } else {
-          setKimonos(prevKimonos => [...prevKimonos, ...preprocessKimonosDates(data)]);
-        }
-        setPrevSearchQuery(debouncedSearchQuery);
-      } catch (error) {
-        console.error('Failed to fetch data:', error);
-      } finally {
-        setIsLoading(false);
+  const fetchKimonos = async () => {
+    setIsLoading(true);
+    try {
+      const data = await getKimonos<Kimono[]>('kimonos', page, 20, searchQuery);
+      const processedData = preprocessKimonosDates(data);
+      if (page === 1) {
+        setKimonos(processedData);
+      } else {
+        setKimonos(prevKimonos => [...prevKimonos, ...processedData]);
       }
+      setHasMoreKimonos(data.length === 20);
+    } catch (error) {
+      console.error('Failed to fetch data:', error);
+    } finally {
+      setIsLoading(false);
     }
-    fetchMoreKimonos();
-  }, [page, debouncedSearchQuery]);
+  };
 
+
+  // Debounce Kimonos search query to avoid making too many requests in a short period of time
+  const debouncedFetch = debounce(fetchKimonos, 300);
+  
   const loadMoreItems = () => {
     if (!isLoading && hasMoreKimonos) {
       setPage((prevPage) => prevPage + 1);
@@ -68,6 +58,22 @@ function App() {
   // Debounce the loadMoreItems function so it only triggers once after a specified delay
   const debouncedLoadMoreItems = debounce(loadMoreItems, 100);
 
+  const handleKimonoCardClick = (kimono: Kimono) => {
+    setSelectedKimono(kimono);
+  };
+
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
+    setPage(1);
+  };
+
+  useEffect(() => {
+    debouncedFetch();
+    return () => {
+      debouncedFetch.cancel();
+    };
+  }, [searchQuery, page]);
+  
   useEffect(() => {
     const handleScroll = () => {
       // Checks if the user is within 100px from the bottom
@@ -84,65 +90,34 @@ function App() {
     }
   }, [isLoading, hasMoreKimonos]);
 
-  // Filter kimonos based on search query
-  const filteredKimonos = kimonos.filter(
-    (kimono) =>
-      kimono.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      kimono.price.some((price) => price.toString().includes(searchQuery)),
-  );
-
-  // Function to handle kimono card click and display price history
-  const handleKimonoCardClick = (kimono: Kimono) => {
-    setSelectedKimono(kimono);
-  };
-
-  const debouncedSearch = debounce((value: string) => {
-    setDebouncedSearchQuery(value);
-    setPage(1);
-  }, 300);
-
-
-
-  // useEffect(() => {
-  //   debouncedSearch(inputValue);
-  //   return () => {
-  //     // Cancel the debounced search when component unmounts
-  //     debouncedSearch.cancel();
-  //   };
-  // }, [inputValue]);
-
-  const handleSearchChange = (value: string) => {
-    setSearchQuery(value);
-    setPage(1);
-  };
-
   return (
     <div className="App">
       {/* Header */}
       <header>
         <div className="header-title">Brazilian Jiu-Jitsu Kimonos</div>
         {/* Search bar and filter options */}
-        {/* Search bar */}
         <SearchBar value={searchQuery} onChange={handleSearchChange} />
       </header>
       {/* Kimono Cards */}
-      <div className="kimono-card-list">
-        {filteredKimonos.map((kimono) => (
-          <KimonoCard
-            key={kimono._id}
-            kimono={kimono}
-            onClick={handleKimonoCardClick}
-          />
-        ))}
-      </div>
+      
+        <div className="kimono-card-list">
+          {kimonos.map((kimono) => (
+            <KimonoCard
+              key={kimono._id}
+              kimono={kimono}
+              onClick={handleKimonoCardClick}
+            />
+          ))}
+        </div>
+      
       {isLoading && <div>Loading more kimonos...</div>}
       {/* Kimono Price History */}
       {selectedKimono && (
         <Modal onClose={() => setSelectedKimono(null)}>
           <KimonoGraph
-              kimono={selectedKimono}
-              onClose={() => setSelectedKimono(null)}
-            />
+            kimono={selectedKimono}
+            onClose={() => setSelectedKimono(null)}
+          />
         </Modal>
       )}
     </div>
