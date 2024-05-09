@@ -13,12 +13,14 @@ function App() {
   const [kimonos, setKimonos] = useState<Kimono[]>([]); // State to store kimono data
   const [selectedKimono, setSelectedKimono] = useState<Kimono | null>(null); // State for selected kimono
   const [searchQuery, setSearchQuery] = useState<string>(""); // State for search query
-  const [isLoading, setIsLoading] = useState(false);
-  const [page, setPage] = useState(1);
-  const [hasMoreKimonos, setHasMoreKimonos] = useState(true);
-  const [prevSearchQuery, setPrevSearchQuery] = useState<string | null>(null);
-
-
+  const [isLoading, setIsLoading] = useState(false); // State for loading status
+  const [page, setPage] = useState(1); // State for pagination
+  const [hasMoreKimonos, setHasMoreKimonos] = useState(true); // State for checking if there are more kimonos to fetch
+  const [prevSearchQuery, setPrevSearchQuery] = useState<string | null>(null); // State for previous search query
+  const [inputValue, setInputValue] = useState(""); // State for input value
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>(""); // State for debounced search query
+  
+  
   const preprocessKimonosDates = (kimonos: Kimono[]) => {
     return kimonos.map((kimono) => {
       const formattedDates = kimono.timestamp.map((timestampString) => {
@@ -42,12 +44,12 @@ function App() {
           // this has to be here, otherwise, when clearing the search, the flag is never set
           setHasMoreKimonos(true);
         }
-        if (searchQuery !== prevSearchQuery || page === 1) {
+        if (debouncedSearchQuery !== prevSearchQuery || page === 1) {
           setKimonos(preprocessKimonosDates(data));
         } else {
           setKimonos(prevKimonos => [...prevKimonos, ...preprocessKimonosDates(data)]);
         }
-        setPrevSearchQuery(searchQuery);
+        setPrevSearchQuery(debouncedSearchQuery);
       } catch (error) {
         console.error('Failed to fetch data:', error);
       } finally {
@@ -55,7 +57,7 @@ function App() {
       }
     }
     fetchMoreKimonos();
-  }, [page, searchQuery]);
+  }, [page, debouncedSearchQuery]);
 
   const loadMoreItems = () => {
     if (!isLoading && hasMoreKimonos) {
@@ -65,6 +67,7 @@ function App() {
   
   // Debounce the loadMoreItems function so it only triggers once after a specified delay
   const debouncedLoadMoreItems = debounce(loadMoreItems, 100);
+
   useEffect(() => {
     const handleScroll = () => {
       // Checks if the user is within 100px from the bottom
@@ -93,7 +96,21 @@ function App() {
     setSelectedKimono(kimono);
   };
 
-  // Function to handle search input change
+  const debouncedSearch = debounce((value: string) => {
+    setDebouncedSearchQuery(value);
+    setPage(1);
+  }, 300);
+
+
+
+  // useEffect(() => {
+  //   debouncedSearch(inputValue);
+  //   return () => {
+  //     // Cancel the debounced search when component unmounts
+  //     debouncedSearch.cancel();
+  //   };
+  // }, [inputValue]);
+
   const handleSearchChange = (value: string) => {
     setSearchQuery(value);
     setPage(1);

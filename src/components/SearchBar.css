@@ -1,16 +1,6 @@
 /* SearchBar.css */
-input[type="text"] {
-  width: 100%;
-  padding: 10px;
-  border: none;
-  border-radius: 5px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  margin: 10px 0;
-  font-size: 16px;
-  outline: none;
-}
 
-/* .search-bar {
+.search-bar {
   display: block;
   width: 50%;
   margin: 0 auto;
@@ -25,6 +15,6 @@ input[type="text"] {
 
 .search-bar:focus {
   border-color: #5a5ad8;
-} */
+}
 
 /* Customize the search input's appearance as needed */
