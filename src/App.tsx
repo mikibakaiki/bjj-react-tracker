@@ -9,7 +9,6 @@ import { DateTime } from "luxon";
 import { Kimono } from "./types";
 import Modal from "./components/Modal";
 import BeltLoader from "./components/BeltLoader";
-import EmptyCard from "./components/EmptyCard";
 
 function App() {
   const [kimonos, setKimonos] = useState<Kimono[]>([]); // State to store kimono data
@@ -149,7 +148,7 @@ function App() {
         ))}
         {isInfiniteScrollLoading &&
           Array.from({ length: emptyCardsCount }).map((_, index) => (
-            <EmptyCard key={index} />
+            <KimonoCard key={index} kimono={null} onClick={() => null} />
           ))}
       </div>
       {isInfiniteScrollLoading && (
