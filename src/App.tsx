@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import KimonoCard from "./components/KimonoCard"; // Create a KimonoCard component for displaying kimono details
 import KimonoGraph from "./components/KimonoGraph";
 import SearchBar from "./components/SearchBar"; // Create a KimonoGraph component for displaying price history
@@ -23,6 +23,9 @@ function App() {
   const [emptyCardsCount, setEmptyCardsCount] = useState(0); // New state for empty cards count
   const [isInfiniteScrollLoading, setIsInfiniteScrollLoading] = useState(false);
 
+  // Ref to track ongoing requests
+  const isFetchingRef = useRef(false);
+  
   const preprocessKimonosDates = (kimonos: Kimono[]) => {
     return kimonos.map((kimono) => {
       const formattedDates = kimono.timestamp.map((timestampString) => {
@@ -33,7 +36,10 @@ function App() {
   };
 
   const fetchKimonos = async () => {
-    if (page === 1 || searchQuery) {
+    if (isFetchingRef.current) return; // Prevent duplicate fetches
+    isFetchingRef.current = true;
+
+    if (page === 1) {
       setShowLoader(true);
     } else {
       setIsInfiniteScrollLoading(true);
@@ -58,7 +64,9 @@ function App() {
       } catch (error) {
         console.error("Failed to fetch data:", error);
       } finally {
-        if (page === 1 || searchQuery) {
+        isFetchingRef.current = false;
+        setIsLoading(false);
+        if (page === 1) {
           setShowLoader(false);
         } else {
           setIsInfiniteScrollLoading(false);
@@ -75,7 +83,7 @@ function App() {
       const bottom =
         window.scrollY + window.innerHeight >=
         document.documentElement.scrollHeight - 200;
-      if (bottom && !isInfiniteScrollLoading && hasMoreKimonos) {
+      if (bottom && !isFetchingRef.current && hasMoreKimonos) {
         console.log("Reached bottom, loading more items");
         setPage((prevPage) => prevPage + 1);
       }
@@ -85,7 +93,7 @@ function App() {
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, [isInfiniteScrollLoading, hasMoreKimonos]);
+  }, [hasMoreKimonos]);
 
   useEffect(() => {
     fetchKimonos();
