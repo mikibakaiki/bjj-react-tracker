@@ -3,7 +3,7 @@ import KimonoCard from "./components/KimonoCard"; // Create a KimonoCard compone
 import KimonoGraph from "./components/KimonoGraph";
 import SearchBar from "./components/SearchBar"; // Create a KimonoGraph component for displaying price history
 import "./App.scss";
-import { debounce } from "lodash";
+import { debounce, throttle } from "lodash";
 import { getKimonos } from "./services/api.service";
 import { DateTime } from "luxon";
 import { Kimono } from "./types";
@@ -16,7 +16,6 @@ function App() {
   const [selectedKimono, setSelectedKimono] = useState<Kimono | null>(null); // State for selected kimono
   const [inputValue, setInputValue] = useState<string>(""); // New state for immediate input update
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [isLoading, setIsLoading] = useState(false); // State for loading status
   const [showLoader, setShowLoader] = useState(true); // Flag to control when the loader should be displayed
   const [page, setPage] = useState(1); // State for pagination
   const [hasMoreKimonos, setHasMoreKimonos] = useState(true); // State for checking if there are more kimonos to fetch
@@ -25,7 +24,7 @@ function App() {
 
   // Ref to track ongoing requests
   const isFetchingRef = useRef(false);
-  
+
   const preprocessKimonosDates = (kimonos: Kimono[]) => {
     return kimonos.map((kimono) => {
       const formattedDates = kimono.timestamp.map((timestampString) => {
@@ -45,7 +44,6 @@ function App() {
       setIsInfiniteScrollLoading(true);
       setEmptyCardsCount(20); // Display 20 empty cards while fetching more data
     }
-    setIsLoading(true);
     setTimeout(async () => {
       try {
         const data = await getKimonos<Kimono[]>(
@@ -65,7 +63,6 @@ function App() {
         console.error("Failed to fetch data:", error);
       } finally {
         isFetchingRef.current = false;
-        setIsLoading(false);
         if (page === 1) {
           setShowLoader(false);
         } else {
@@ -73,27 +70,32 @@ function App() {
           setEmptyCardsCount(0); // Hide empty cards after data is fetched
         }
       }
-    }, 1000);
+    }, 750);
   };
 
-  // scroll event listener to fetch more kimonos when the user 
+  // scroll event listener to fetch more kimonos when the user
   // reaches the bottom of the page
   useEffect(() => {
-    const handleScroll = () => {
+    const handleScroll = throttle(() => {
       const bottom =
         window.scrollY + window.innerHeight >=
         document.documentElement.scrollHeight - 200;
-      if (bottom && !isFetchingRef.current && hasMoreKimonos) {
+      if (
+        bottom &&
+        !isFetchingRef.current &&
+        hasMoreKimonos &&
+        !isInfiniteScrollLoading
+      ) {
         console.log("Reached bottom, loading more items");
         setPage((prevPage) => prevPage + 1);
       }
-    };
+    }, 1000); // Throttle the scroll event handling to run at most once every 200ms
 
     window.addEventListener("scroll", handleScroll);
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, [hasMoreKimonos]);
+  }, [hasMoreKimonos, isInfiniteScrollLoading]);
 
   useEffect(() => {
     fetchKimonos();
