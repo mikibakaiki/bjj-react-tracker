@@ -4,7 +4,7 @@
     "containerDefinitions": [
       {
         "name": "bjj-tracker-react-container",
-        "image": "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/bjj-tracker-react:${IMAGE_TAG}",
+        "image": "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/bjj-tracker-react:${VERSION}",
         "portMappings": [
           {
             "containerPort": 80,
