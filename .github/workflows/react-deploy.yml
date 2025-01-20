@@ -1,0 +1,51 @@
+name: Deploy React App to AWS
+
+on:
+  workflow_dispatch: # Manual trigger for deployment
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Step 1: Checkout the repository
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    # Step 2: Log in to Amazon ECR
+    - name: Log in to Amazon ECR
+      uses: aws-actions/amazon-ecr-login@v2
+
+    # Step 3: Build and Push Docker Image to ECR
+    - name: Build and Push Docker Image
+      env:
+        AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+        AWS_REGION: ${{ secrets.AWS_REGION }}
+        VITE_REACT_APP_API_BASE_URL: ${{ secrets.VITE_REACT_APP_API_BASE_URL }}
+      run: |
+        IMAGE_TAG=$(git rev-parse --short HEAD)
+        ECR_URI=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/bjj-tracker-react
+        echo "VITE_REACT_APP_API_BASE_URL=${VITE_REACT_APP_API_BASE_URL}" > .env.production
+        docker build -t bjj-tracker-react:$IMAGE_TAG .
+        docker tag bjj-tracker-react:$IMAGE_TAG $ECR_URI:$IMAGE_TAG
+        docker push $ECR_URI:$IMAGE_TAG
+
+    # Step 4: Register ECS Task Definition
+    - name: Register Task Definition
+      env:
+        AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+        AWS_REGION: ${{ secrets.AWS_REGION }}
+      run: |
+        IMAGE_TAG=$(git rev-parse --short HEAD)
+        envsubst < aws/react-task-template.json > aws/react-task.json
+        aws ecs register-task-definition --cli-input-json file://aws/react-task.json
+
+    # Step 5: Update ECS Service
+    - name: Update ECS Service
+      env:
+        AWS_REGION: ${{ secrets.AWS_REGION }}
+      run: |
+        aws ecs update-service \
+          --cluster bjj-tracker-cluster \
+          --service bjj-tracker-react-service \
+          --force-new-deployment

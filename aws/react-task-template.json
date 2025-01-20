@@ -1,0 +1,21 @@
+{
+    "family": "react-task",
+    "networkMode": "awsvpc",
+    "containerDefinitions": [
+      {
+        "name": "bjj-tracker-react-container",
+        "image": "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/bjj-tracker-react:${IMAGE_TAG}",
+        "portMappings": [
+          {
+            "containerPort": 80,
+            "protocol": "tcp"
+          }
+        ],
+        "essential": true
+      }
+    ],
+    "requiresCompatibilities": ["FARGATE"],
+    "cpu": "256",
+    "memory": "512",
+    "executionRoleArn": "arn:aws:iam::${AWS_ACCOUNT_ID}:role/ecsTaskExecutionRole"
+  }

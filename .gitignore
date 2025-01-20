@@ -1,5 +1,6 @@
-.env
-
+.env.development
+.env.production
+/aws/react-task.json
 # Logs
 logs
 *.log
