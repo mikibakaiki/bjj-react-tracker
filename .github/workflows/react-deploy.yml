@@ -1,26 +1,34 @@
 name: Deploy React App to AWS
 
 on:
-  workflow_dispatch: # Manual trigger for deployment
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - 'src/**'
+      - 'public/**'
+      - 'Dockerfile'
+      - '.github/workflows/**'
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    
+    concurrency: 
+      group: production
+      cancel-in-progress: true
 
     steps:
-    # Step 1: Checkout the repository
     - name: Checkout Code
       uses: actions/checkout@v4
 
-    # Step 2: Extract Commit Hash
     - name: Extract Commit Hash
       id: commit
       run: |
         COMMIT_HASH=$(git rev-parse --short HEAD)
         echo "Commit hash: $COMMIT_HASH"
-        echo "::set-output name=commit_hash::$COMMIT_HASH"
+        echo "commit_hash=$COMMIT_HASH" >> $GITHUB_OUTPUT
 
-    # Step 3: Configure AWS Credentials
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v4
       with:
@@ -28,32 +36,37 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ secrets.AWS_REGION }}
     
-    # Step 4: Log in to Amazon ECR
     - name: Log in to Amazon ECR
       uses: aws-actions/amazon-ecr-login@v2
       with:
         region: ${{ secrets.AWS_REGION }}
 
-    # Step 5: Build and Push Docker Image to ECR
     - name: Build and push Docker image
       run: |
-        # Build and tag the Docker image
-        IMAGE_TAG=${{ steps.commit.outputs.commit_hash }}
-        ECR_URI=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/bjj-tracker-react
+            IMAGE_TAG=${{ steps.commit.outputs.commit_hash }}
+            ECR_URI=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/bjj-tracker-react
 
-        echo "VITE_REACT_APP_API_BASE_URL=${VITE_REACT_APP_API_BASE_URL}" > .env.production
+            echo "VITE_REACT_APP_API_BASE_URL=${VITE_REACT_APP_API_BASE_URL}" > .env.production
 
-        echo "Docker Image: bjj-tracker-react:$IMAGE_TAG"
-
-        docker build -t bjj-tracker-react:$IMAGE_TAG .
-        docker tag bjj-tracker-react:$IMAGE_TAG $ECR_URI:$IMAGE_TAG
-        docker push $ECR_URI:$IMAGE_TAG
+            # Build with commit hash tag
+            docker build -t bjj-tracker-react:$IMAGE_TAG .
+            
+            # Tag with commit hash
+            docker tag bjj-tracker-react:$IMAGE_TAG $ECR_URI:$IMAGE_TAG
+            # Tag as latest
+            docker tag bjj-tracker-react:$IMAGE_TAG $ECR_URI:latest
+            # Tag with branch name (assuming main branch)
+            docker tag bjj-tracker-react:$IMAGE_TAG $ECR_URI:main
+            
+            # Push all tags
+            docker push $ECR_URI:$IMAGE_TAG
+            docker push $ECR_URI:latest
+            docker push $ECR_URI:main
       env:
         AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
         AWS_REGION: ${{ secrets.AWS_REGION }}
         VITE_REACT_APP_API_BASE_URL: ${{ secrets.VITE_REACT_APP_API_BASE_URL }}
 
-    # Step 6: Replace Placeholders in Task Definition
     - name: Replace Placeholders in Task Definition
       env:
         AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
@@ -63,13 +76,40 @@ jobs:
         envsubst < aws/react-task-template.json > aws/react-task.json
         echo "Version: $VERSION"
 
-    # Step 5: Update ECS Service
+    - name: Register Task Definition
+      id: register-task-def
+      run: |
+        TASK_DEF=$(aws ecs register-task-definition \
+          --cli-input-json file://aws/react-task.json \
+          --query 'taskDefinition.taskDefinitionArn' \
+          --output text)
+        echo "TASK_DEF=$TASK_DEF" >> $GITHUB_OUTPUT
+
     - name: Update ECS Service
-      env:
-        AWS_REGION: ${{ secrets.AWS_REGION }}
       run: |
         aws ecs update-service \
           --cluster bjj-tracker-cluster \
           --service bjj-tracker-react-service \
-          --task-definition react-task \
+          --task-definition ${{ steps.register-task-def.outputs.TASK_DEF }} \
           --force-new-deployment
+
+    - name: Verify Deployment
+      run: |
+        aws ecs wait services-stable \
+          --cluster bjj-tracker-cluster \
+          --services bjj-tracker-react-service
+
+    - name: Cleanup Old Images
+      if: success()
+      run: |
+        REPO_NAME="bjj-tracker-react"
+        # Keep more recent images (last 10)
+        aws ecr describe-images \
+          --repository-name $REPO_NAME \
+          --query 'imageDetails[?type(imageTag)!=`null`].[imageDigest]' \
+          --output text | \
+        sort -r | \
+        tail -n +11 | \
+        xargs -I {} aws ecr batch-delete-image \
+          --repository-name $REPO_NAME \
+          --image-ids imageDigest={}

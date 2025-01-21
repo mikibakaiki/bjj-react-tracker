@@ -1,4 +1,4 @@
-FROM node:lts-bullseye as dist
+FROM node:lts-bullseye as nodebuild
 
 # Set the working directory
 WORKDIR /app
@@ -15,7 +15,11 @@ RUN npm run build
 FROM nginx:alpine
 
 # Copy the built files to the Nginx web server
-COPY --from=dist /app/dist /usr/share/nginx/html
+# /app/dist is the built folder.
+COPY --from=nodebuild /app/dist /usr/share/nginx/html
+
+# Copy the custom Nginx configuration file
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Expose the default Nginx port
 EXPOSE 80

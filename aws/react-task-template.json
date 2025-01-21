@@ -1,21 +1,37 @@
 {
-    "family": "react-task",
-    "networkMode": "awsvpc",
-    "containerDefinitions": [
-      {
-        "name": "bjj-tracker-react-container",
-        "image": "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/bjj-tracker-react:${VERSION}",
-        "portMappings": [
-          {
-            "containerPort": 80,
-            "protocol": "tcp"
-          }
-        ],
-        "essential": true
+  "family": "react-task",
+  "networkMode": "awsvpc",
+  "containerDefinitions": [
+    {
+      "name": "bjj-tracker-react-container",
+      "image": "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/bjj-tracker-react:${VERSION}",
+      "portMappings": [
+        {
+          "containerPort": 80,
+          "protocol": "tcp"
+        }
+      ],
+      "essential": true,
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/bjj-tracker-react",
+          "awslogs-region": "${AWS_REGION}",
+          "awslogs-stream-prefix": "ecs",
+          "awslogs-create-group": "true"
+        }
+      },
+      "healthCheck": {
+        "command": ["CMD-SHELL", "curl -f http://localhost/health || exit 1"],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 60
       }
-    ],
-    "requiresCompatibilities": ["FARGATE"],
-    "cpu": "256",
-    "memory": "512",
-    "executionRoleArn": "arn:aws:iam::${AWS_ACCOUNT_ID}:role/ecsTaskExecutionRole"
-  }
+    }
+  ],
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "256",
+  "memory": "512",
+  "executionRoleArn": "arn:aws:iam::${AWS_ACCOUNT_ID}:role/ecsTaskExecutionRole"
+}
