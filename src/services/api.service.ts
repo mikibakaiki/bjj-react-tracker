@@ -1,4 +1,4 @@
-const getApiUrl = (endpoint: string) => new URL(`${import.meta.env.VITE_REACT_APP_API_BASE_URL}/${endpoint}`);
+const getApiUrl = (endpoint: string) => new URL(`${import.meta.env.VITE_REACT_APP_API_BASE_URL}/api/${endpoint}`);
 
 export const getKimonos = async <T>(endpoint: string, page: number, limit: number, filter: string, options?: RequestInit): Promise<T> => {
     // Construct query parameters for pagination: limit = # of kimonos/page; offset=page
