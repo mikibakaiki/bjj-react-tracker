@@ -1,14 +1,7 @@
-name: Deploy React App to AWS
+name: Deploy to AWS
 
 on:
   workflow_dispatch:
-  push:
-    branches: [ main ]
-    paths:
-      - 'src/**'
-      - 'public/**'
-      - 'Dockerfile'
-      - '.github/workflows/**'
 
 jobs:
   build-and-deploy:
