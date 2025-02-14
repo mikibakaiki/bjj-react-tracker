@@ -1,4 +1,4 @@
-name: Deploy Frontend
+name: Heroku Deploy
 
 on:
   workflow_dispatch:
