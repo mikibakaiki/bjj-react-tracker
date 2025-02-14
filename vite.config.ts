@@ -1,10 +1,20 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 
+// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        secure: false,
+      }
+    }
+  },
   build: {
-    outDir: '../bjj-tracker-server/client', // Adjust path based on your directory structure
-    emptyOutDir: true
+    outDir: 'dist',
+    sourcemap: false, // set to true if you need debugging in production
   }
-})
+});

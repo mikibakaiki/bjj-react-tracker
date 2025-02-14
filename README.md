@@ -17,3 +17,13 @@ Create a `.env` file and write the API base url, like:
 - [CodeSandbox — Discord](https://discord.gg/Ggarp3pX5H)
 - [Vite — GitHub](https://github.com/vitejs/vite)
 - [Vite — Docs](https://vitejs.dev/guide/)
+
+
+### Heroku Deployment
+
+The serve flags mean:
+
+-s: Single-page application mode (redirects all requests to index.html)
+-n: No clipboard copy
+-L: Enable CORS headers
+-p $PORT: Use Heroku's dynamic port
