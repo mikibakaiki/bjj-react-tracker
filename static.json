@@ -1,0 +1,14 @@
+{
+    "root": "dist",
+    "clean_urls": true,
+    "routes": {
+      "/api/**": {
+        "origin": "${API_URL}${path}"
+      }
+    },
+    "proxies": {
+      "/api/": {
+        "origin": "${API_URL}"
+      }
+    }
+}
