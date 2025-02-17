@@ -7,10 +7,10 @@ import { debounce, throttle } from "lodash";
 import { getKimonos } from "./services/api.service";
 import { DateTime } from "luxon";
 import { Kimono } from "./types";
-import Modal from "./components/Modal";
 import BeltLoader from "./components/BeltLoader";
 import { preprocessKimonosDates } from "./utils";
 import { useInfiniteQuery } from "@tanstack/react-query";
+import Modal from "./components/Modal";
 
 
 interface FetchKimonosResponse {
@@ -70,8 +70,8 @@ function App() {
 
 
   const handleScroll = useCallback(() => {
-    const bottom = 
-      window.scrollY + window.innerHeight >= 
+    const bottom =
+      window.scrollY + window.innerHeight >=
       document.documentElement.scrollHeight - 200;
 
     if (bottom && hasNextPage && !isFetchingNextPage) {
@@ -104,6 +104,7 @@ function App() {
           <SearchBar value={inputValue} onChange={handleInputChange} />
         </div>
       </header>
+
       {/* Kimono Cards */}
       <div className="kimono-card-list">
         {allKimonos.map((kimono) => (
@@ -117,10 +118,6 @@ function App() {
           Array.from({ length: 20 }).map((_, index) => (
             <KimonoCard key={`loading-${index}`} kimono={null} onClick={() => null} />
           ))}
-        {/* {isInfiniteScrollLoading &&
-          Array.from({ length: emptyCardsCount }).map((_, index) => (
-            <KimonoCard key={index} kimono={null} onClick={() => null} />
-          ))} */}
       </div>
 
       {isFetchingNextPage && (
@@ -129,14 +126,12 @@ function App() {
         </div>
       )}
 
-      {/* {isInfiniteScrollLoading && (
-        <div className="loader-overlay">
-          <BeltLoader />
-        </div>
-      )} */}
       {/* Kimono Price History */}
       {selectedKimono && (
-        <Modal onClose={() => setSelectedKimono(null)}>
+        <Modal 
+          onClose={() => setSelectedKimono(null)}
+          title={`Price History - ${selectedKimono.name}`}
+        >
           <KimonoGraph
             kimono={selectedKimono}
             onClose={() => setSelectedKimono(null)}

@@ -71,7 +71,6 @@ const KimonoGraph: React.FC<KimonoGraphProps> = ({ kimono, onClose }) => {
 
   return (
     <div className="kimono-graph">
-      <h2>Price History for {kimono.name}</h2>
       <div className="timeframe-pills">
         {["all", "1year", "6months", "3months"].map((period) => (
           <button
@@ -91,9 +90,19 @@ const KimonoGraph: React.FC<KimonoGraphProps> = ({ kimono, onClose }) => {
       </div>
       <div className="chart-container">
         <LineChart
-          width={window.innerWidth < 768 ? 300 : 700}
+          width={
+            window.innerWidth < 768
+              ? Math.min(280, window.innerWidth - 80)
+              : Math.min(680, window.innerWidth - 140)
+          }
           height={window.innerWidth < 768 ? 200 : 400}
           data={extremeData}
+          margin={{
+            top: 5,
+            right: 40, // seems to make the chart fit better
+            left: 0, // Reduce left margin
+            bottom: 5,
+          }}
         >
           <XAxis
             dataKey="date"
