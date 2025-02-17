@@ -9,123 +9,87 @@ import { DateTime } from "luxon";
 import { Kimono } from "./types";
 import Modal from "./components/Modal";
 import BeltLoader from "./components/BeltLoader";
+import { preprocessKimonosDates } from "./utils";
+import { useInfiniteQuery } from "@tanstack/react-query";
+
+
+interface FetchKimonosResponse {
+  kimonos: Kimono[];
+  nextPage?: number;
+}
 
 function App() {
-  const [kimonos, setKimonos] = useState<Kimono[]>([]); // State to store kimono data
   const [selectedKimono, setSelectedKimono] = useState<Kimono | null>(null); // State for selected kimono
-  const [inputValue, setInputValue] = useState<string>(""); // New state for immediate input update
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [showLoader, setShowLoader] = useState(true); // Flag to control when the loader should be displayed
-  const [page, setPage] = useState(1); // State for pagination
-  const [hasMoreKimonos, setHasMoreKimonos] = useState(true); // State for checking if there are more kimonos to fetch
-  const [emptyCardsCount, setEmptyCardsCount] = useState(0); // New state for empty cards count
-  const [isInfiniteScrollLoading, setIsInfiniteScrollLoading] = useState(false);
 
-  // Ref to track ongoing requests
-  const isFetchingRef = useRef(false);
-
-  const preprocessKimonosDates = (kimonos: Kimono[]) => {
-    return kimonos.map((kimono) => {
-      const formattedDates = kimono.timestamp.map((timestampString) => {
-        return DateTime.fromISO(timestampString).toFormat("dd/MM/yyyy");
-      });
-      return { ...kimono, timestamp: formattedDates };
-    });
+  const fetchKimonos = async ({ pageParam = 1 }): Promise<FetchKimonosResponse> => {
+    const res = await getKimonos<Kimono[]>(
+      'kimonos',
+      pageParam,
+      20,
+      searchQuery
+    );
+    return {kimonos: preprocessKimonosDates(res), nextPage: res.length === 20 ? pageParam + 1 : undefined} as FetchKimonosResponse;
   };
 
-  const fetchKimonos = async () => {
-    if (isFetchingRef.current) return; // Prevent duplicate fetches
-    isFetchingRef.current = true;
-
-    if (page === 1) {
-      setShowLoader(true);
-    } else {
-      setIsInfiniteScrollLoading(true);
-      setEmptyCardsCount(20); // Display 20 empty cards while fetching more data
-    }
-    setTimeout(async () => {
-      try {
-        const data = await getKimonos<Kimono[]>(
-          "kimonos",
-          page,
-          20,
-          searchQuery
-        );
-        const processedData = preprocessKimonosDates(data);
-        if (page === 1) {
-          setKimonos(processedData);
-        } else {
-          setKimonos((prevKimonos) => [...prevKimonos, ...processedData]);
-        }
-        setHasMoreKimonos(data.length === 20);
-      } catch (error) {
-        console.error("Failed to fetch data:", error);
-      } finally {
-        isFetchingRef.current = false;
-        if (page === 1) {
-          setShowLoader(false);
-        } else {
-          setIsInfiniteScrollLoading(false);
-          setEmptyCardsCount(0); // Hide empty cards after data is fetched
-        }
-      }
-    }, 750);
-  };
-
-  // scroll event listener to fetch more kimonos when the user
-  // reaches the bottom of the page
-  useEffect(() => {
-    const handleScroll = throttle(() => {
-      const bottom =
-        window.scrollY + window.innerHeight >=
-        document.documentElement.scrollHeight - 200;
-      if (
-        bottom &&
-        !isFetchingRef.current &&
-        hasMoreKimonos &&
-        !isInfiniteScrollLoading
-      ) {
-        console.log("Reached bottom, loading more items");
-        setPage((prevPage) => prevPage + 1);
-      }
-    }, 1000); // Throttle the scroll event handling to run at most once every 200ms
-
-    window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, [hasMoreKimonos, isInfiniteScrollLoading]);
-
-  useEffect(() => {
-    fetchKimonos();
-  }, [searchQuery, page]);
+  const {
+    data,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetching,
+    isFetchingNextPage,
+    status,
+  } = useInfiniteQuery({
+    queryKey: ['kimonos', searchQuery],
+    queryFn: fetchKimonos,
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => lastPage.nextPage,
+  });
 
   // Debounced function to update searchQuery
   const debouncedSearch = useCallback(
     debounce((value: string) => {
       setSearchQuery(value);
-      setPage(1);
     }, 300),
     []
   );
+
+  // Update handler
+  const handleSearchChange = (value: string) => {
+    debouncedSearch(value);
+  };
+
 
   const handleKimonoCardClick = (kimono: Kimono) => {
     setSelectedKimono(kimono);
   };
 
-  // Immediate update for input value
-  const handleInputChange = (value: string) => {
-    setInputValue(value);
-    debouncedSearch(value);
-  };
 
-  if (showLoader) {
+  const handleScroll = useCallback(() => {
+    const bottom = 
+      window.scrollY + window.innerHeight >= 
+      document.documentElement.scrollHeight - 200;
+
+    if (bottom && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
+
+  React.useEffect(() => {
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [handleScroll]);
+
+  if (status === "pending") {
     return (
       <div className="loader-container">
         <BeltLoader />
       </div>
     );
   }
+
+  const allKimonos = data?.pages.flatMap((page) => page.kimonos) ?? [];
 
   return (
     <div className="App">
@@ -134,28 +98,30 @@ function App() {
         <div className="header-title">Brazilian Jiu-Jitsu Kimonos</div>
         {/* Search bar and filter options */}
         <div className="search-bar-container">
-          <SearchBar value={inputValue} onChange={handleInputChange} />
+          <SearchBar value={searchQuery} onChange={handleSearchChange} />
         </div>
       </header>
       {/* Kimono Cards */}
       <div className="kimono-card-list">
-        {kimonos.map((kimono) => (
+        {allKimonos.map((kimono) => (
           <KimonoCard
             key={kimono._id}
             kimono={kimono}
             onClick={handleKimonoCardClick}
           />
         ))}
-        {isInfiniteScrollLoading &&
-          Array.from({ length: emptyCardsCount }).map((_, index) => (
-            <KimonoCard key={index} kimono={null} onClick={() => null} />
+        {isFetchingNextPage &&
+          Array.from({ length: 20 }).map((_, index) => (
+            <KimonoCard key={`loading-${index}`} kimono={null} onClick={() => null} />
           ))}
       </div>
-      {isInfiniteScrollLoading && (
+
+      {isFetchingNextPage && (
         <div className="loader-overlay">
           <BeltLoader />
         </div>
       )}
+
       {/* Kimono Price History */}
       {selectedKimono && (
         <Modal onClose={() => setSelectedKimono(null)}>
