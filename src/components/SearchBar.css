@@ -1,43 +1,79 @@
-/* Styling for the search bar container */
 .search-bar {
   display: flex;
   align-items: center;
-  justify-content: space-between; /* Ensures space between elements */
-  background-color: #F0F0F0; /* Light grey background */
+  justify-content: space-between;
+  background-color: #F0F0F0;
   border-radius: 20px;
-  width: 50%; /* Takes up half of the parent width */
-  min-width: 300px; /* Minimum width to ensure usability */
+  width: 90%; /* Increased from 50% for better mobile display */
+  max-width: 800px; /* Added max-width for larger screens */
+  min-width: auto; /* Remove fixed min-width to allow full responsiveness */
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  padding: 8px 15px; /* Ample padding for aesthetics */
-  transition: all 0.3s ease-in-out; /* Smooth transitions for interactions */
+  padding: 8px 15px;
+  transition: all 0.3s ease-in-out;
+  margin: 0 auto; /* Center the search bar */
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
+/* Enhanced responsive adjustments */
+@media (max-width: 1200px) {
   .search-bar {
-      width: 100%; /* Full width on smaller screens */
+    width: 85%;
   }
 }
 
-/* Styling for the input field inside the search bar */
+@media (max-width: 992px) {
+  .search-bar {
+    width: 80%;
+  }
+}
+
+@media (max-width: 768px) {
+  .search-bar {
+    width: 90%;
+    padding: 6px 12px;
+  }
+  
+  .search-bar input {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .search-bar {
+    width: 95%;
+    padding: 4px 10px;
+  }
+  
+  .search-bar input {
+    font-size: 13px;
+    padding: 8px;
+  }
+  
+  .search-bar .search-icon,
+  .search-bar .clear-icon {
+    padding: 0 6px;
+  }
+}
+
+/* Update input styling */
 .search-bar input {
-  flex-grow: 1; /* Allows input to fill available space */
+  flex-grow: 1;
   background-color: transparent;
   border: none;
   outline: none;
   padding: 10px;
-  font-size: 16px; /* Sufficient size for readability */
-  color: #333; /* Dark color for contrast on light background */
+  font-size: 16px;
+  color: #333;
+  width: 100%; /* Ensure input takes full width */
+  min-width: 0; /* Prevent input from overflowing */
 }
 
-/* Styling for icons */
-.search-bar .search-icon, .search-bar .clear-icon {
-  color: #666; /* Medium grey for icons */
+/* Icon adjustments */
+.search-bar .search-icon,
+.search-bar .clear-icon {
+  color: #666;
   cursor: pointer;
-  padding: 0 10px; /* Padding around icons for easier interaction */
-}
-
-.search-bar .search-icon:hover, .search-bar .clear-icon:hover {
-  color: #333; /* Darken icons on hover for feedback */
-  transform: scale(1.1); /* Slight enlargement on hover */
+  padding: 0 8px;
+  min-width: 20px; /* Ensure minimum touchable area */
+  display: flex;
+  align-items: center;
 }

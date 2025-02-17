@@ -33,8 +33,25 @@ body {
   width: 100%;
   display: flex;
   justify-content: center;
-  margin-bottom: 20px; /* space between search bar and cards */
+  align-items: center;
+  margin: 20px auto;
+  padding: 0 15px; /* Add padding for smaller screens */
+  box-sizing: border-box;
 }
+
+@media (max-width: 480px) {
+  .header-title {
+    font-size: 1.8em;
+    margin-top: 15px;
+    margin-bottom: 15px;
+  }
+  
+  .search-bar-container {
+    padding: 0 10px;
+    margin: 15px auto;
+  }
+}
+
 
 .loader-container {
   display: flex;

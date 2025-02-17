@@ -20,7 +20,9 @@ interface FetchKimonosResponse {
 
 function App() {
   const [selectedKimono, setSelectedKimono] = useState<Kimono | null>(null); // State for selected kimono
-  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [inputValue, setInputValue] = useState<string>(""); // For immediate UI updates
+  const [searchQuery, setSearchQuery] = useState<string>(""); // For debounced API calls
+
 
   const fetchKimonos = async ({ pageParam = 1 }): Promise<FetchKimonosResponse> => {
     const res = await getKimonos<Kimono[]>(
@@ -47,17 +49,18 @@ function App() {
     getNextPageParam: (lastPage) => lastPage.nextPage,
   });
 
-  // Debounced function to update searchQuery
-  const debouncedSearch = useCallback(
-    debounce((value: string) => {
-      setSearchQuery(value);
-    }, 300),
-    []
-  );
+  // Debounced query for API calls
+  const debouncedQuery = useRef(
+    debounce((query: string) => {
+      setSearchQuery(query);
+    }, 300)
+  ).current;
 
-  // Update handler
-  const handleSearchChange = (value: string) => {
-    debouncedSearch(value);
+ // Handle input change with immediate UI update
+  const handleInputChange = (value: string) => {
+    // Immediate update for the input field
+    setInputValue(value); // Immediate update for UI
+    debouncedQuery(value); // Debounced API call
   };
 
 
@@ -98,7 +101,7 @@ function App() {
         <div className="header-title">Brazilian Jiu-Jitsu Kimonos</div>
         {/* Search bar and filter options */}
         <div className="search-bar-container">
-          <SearchBar value={searchQuery} onChange={handleSearchChange} />
+          <SearchBar value={inputValue} onChange={handleInputChange} />
         </div>
       </header>
       {/* Kimono Cards */}
@@ -114,6 +117,10 @@ function App() {
           Array.from({ length: 20 }).map((_, index) => (
             <KimonoCard key={`loading-${index}`} kimono={null} onClick={() => null} />
           ))}
+        {/* {isInfiniteScrollLoading &&
+          Array.from({ length: emptyCardsCount }).map((_, index) => (
+            <KimonoCard key={index} kimono={null} onClick={() => null} />
+          ))} */}
       </div>
 
       {isFetchingNextPage && (
@@ -122,6 +129,11 @@ function App() {
         </div>
       )}
 
+      {/* {isInfiniteScrollLoading && (
+        <div className="loader-overlay">
+          <BeltLoader />
+        </div>
+      )} */}
       {/* Kimono Price History */}
       {selectedKimono && (
         <Modal onClose={() => setSelectedKimono(null)}>
