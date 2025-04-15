@@ -11,19 +11,21 @@ import BeltLoader from "./components/BeltLoader";
 import { preprocessKimonosDates } from "./utils";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import Modal from "./components/Modal";
+import FilterBar from "./components/FilterBar";
 
 interface FetchKimonosResponse {
   kimonos: Kimono[];
   nextPage?: number;
 }
 
+type SortDirection = "asc" | "desc";
+type TimePeriod = "today" | "1month" | "3months" | "6months" | "1year" | "all";
 function App() {
   const [selectedKimono, setSelectedKimono] = useState<Kimono | null>(null); // State for selected kimono
   const [inputValue, setInputValue] = useState<string>(""); // For immediate UI updates
   const [searchQuery, setSearchQuery] = useState<string>(""); // For debounced API calls
-  const [timePeriod, setTimePeriod] = useState<
-    "today" | "1month" | "3months" | "6months" | "1year" | "all"
-  >("all");
+  const [timePeriod, setTimePeriod] = useState<TimePeriod>("all");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
 
   const fetchKimonos = async ({
     pageParam = 1,
@@ -67,7 +69,7 @@ function App() {
 
     const now = DateTime.now();
     const periods = {
-      "today": now.minus({ day: 1 }),
+      today: now.minus({ day: 1 }),
       "1month": now.minus({ months: 1 }),
       "3months": now.minus({ months: 3 }),
       "6months": now.minus({ months: 6 }),
@@ -80,6 +82,15 @@ function App() {
         "dd/MM/yyyy"
       );
       return latestDate >= periods[timePeriod];
+    });
+  };
+
+  // Add sorting function
+  const sortKimonos = (kimonos: Kimono[]): Kimono[] => {
+    return [...kimonos].sort((a, b) => {
+      const priceA = a.price[a.price.length - 1];
+      const priceB = b.price[b.price.length - 1];
+      return sortDirection === "asc" ? priceA - priceB : priceB - priceA;
     });
   };
 
@@ -117,8 +128,8 @@ function App() {
     );
   }
 
-  const allKimonos = filterByTimePeriod(
-    data?.pages.flatMap((page) => page.kimonos) ?? []
+  const allKimonos = sortKimonos(
+    filterByTimePeriod(data?.pages.flatMap((page) => page.kimonos) ?? [])
   );
 
   return (
@@ -130,26 +141,14 @@ function App() {
         <div className="search-bar-container">
           <SearchBar value={inputValue} onChange={handleInputChange} />
         </div>
-        <div className="time-filter-chips">
-          {[
-            { value: "all", label: "All Time" },
-            { value: "1year", label: "Last Year" },
-            { value: "6months", label: "6 Months" },
-            { value: "3months", label: "3 Months" },
-            { value: "1month", label: "1 Month" },
-            { value: "today", label: "Today" },
-          ].map((period) => (
-            <button
-              key={period.value}
-              className={`time-chip ${
-                timePeriod === period.value ? "active" : ""
-              }`}
-              onClick={() => setTimePeriod(period.value as typeof timePeriod)}
-            >
-              {period.label}
-            </button>
-          ))}
-        </div>
+        <FilterBar
+          timePeriod={timePeriod}
+          onTimePeriodChange={(period) =>
+            setTimePeriod(period as typeof timePeriod)
+          }
+          sortDirection={sortDirection}
+          onSortChange={setSortDirection}
+        />
       </header>
 
       {/* Kimono Cards */}
