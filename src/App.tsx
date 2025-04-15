@@ -9,11 +9,14 @@ import FilterBar from "./components/FilterBar";
 import { KimonoList } from "./components/KimonoList";
 import { useKimonoData } from "./hooks/useKimonoData";
 import { useInfiniteScroll } from "./hooks/useInfiniteScroll";
+import { useDarkMode } from "./hooks/useDarkMode";
+import DarkModeToggle from "./components/DarkModeToggle";
 
 function App() {
   const [selectedKimono, setSelectedKimono] = useState<Kimono | null>(null);
   const [timePeriod, setTimePeriod] = useState<TimePeriod>("all");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
+  const [isDarkMode, setIsDarkMode] = useDarkMode();
 
   const {
     kimonos,
@@ -38,7 +41,14 @@ function App() {
   return (
     <div className="App">
       <header>
-        <div className="header-title">Brazilian Jiu-Jitsu Kimonos</div>
+        <div className="header-title">
+          Brazilian Jiu-Jitsu Kimonos
+          <DarkModeToggle
+            isDarkMode={isDarkMode}
+            onToggle={() => setIsDarkMode(!isDarkMode)}
+          />
+        </div>
+
         <div className="search-bar-container">
           <SearchBar value={inputValue} onChange={handleInputChange} />
         </div>

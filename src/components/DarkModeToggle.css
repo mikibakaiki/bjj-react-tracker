@@ -1,0 +1,14 @@
+.dark-mode-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    color: var(--text-color);
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+    margin-left: 1rem;
+  }
+  
+  .dark-mode-toggle:hover {
+    transform: scale(1.1);
+  }

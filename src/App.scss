@@ -113,3 +113,44 @@ body {
     }
   }
 }
+
+
+// dark mode
+
+:root {
+  --background-color: #ffffff;
+  --text-color: #333333;
+  --card-background: #f5f5f5;
+  --header-background: #ffffff;
+  --border-color: #ddd;
+  --modal-background: #ffffff;
+  --loader-background: rgba(255, 255, 255, 0.9);
+  --search-bar-background: #f5f5f5;
+  --filter-bar-background: #f5f5f5;
+  --button-hover: #e0e0e0;
+}
+
+.dark-mode {
+  --background-color: #1a1a1a;
+  --text-color: #ffffff;
+  --card-background: #2d2d2d;
+  --header-background: #232323;
+  --border-color: #404040;
+  --modal-background: #2d2d2d;
+  --loader-background: rgba(0, 0, 0, 0.9);
+  --search-bar-background: #2d2d2d;
+  --filter-bar-background: #2d2d2d;
+  --button-hover: #404040;
+}
+
+.App {
+  background-color: var(--background-color);
+  color: var(--text-color);
+  min-height: 100vh;
+  transition: all 0.3s ease;
+}
+
+header {
+  background-color: var(--header-background);
+  border-bottom: 1px solid var(--border-color);
+}

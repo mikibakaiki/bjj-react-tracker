@@ -9,6 +9,10 @@
   transition: transform 0.2s ease-in-out;
   min-height: 400px; /* Ensure cards have a minimum height */
   position: relative; /* Ensure shimmer effect is positioned correctly */
+  background-color: var(--card-background);
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
+  transition: all 0.3s ease;
 }
 
 .kimono-card:hover {
@@ -72,8 +76,12 @@
 
 .shimmer {
   animation: shimmer 1.5s infinite linear;
-  background: #f6f7f8;
-  background: linear-gradient(to right, #eeeeee 8%, #dddddd 18%, #eeeeee 33%);
+  background: linear-gradient(
+    90deg,
+    var(--card-background) 0%,
+    var(--button-hover) 50%,
+    var(--card-background) 100%
+  );
   background-size: 1000px 100%;
   height: 100%;
   width: 100%;
