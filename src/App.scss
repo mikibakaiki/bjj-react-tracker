@@ -74,3 +74,42 @@ body {
   align-items: center;
   z-index: 1000;
 }
+
+// time filtering chips
+.time-filter-chips {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 15px 0;
+  flex-wrap: wrap;
+
+  .time-chip {
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: none;
+    background-color: #f0f0f0;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 14px;
+
+    &:hover {
+      background-color: #e0e0e0;
+    }
+
+    &.active {
+      background-color: #8884d8;
+      color: white;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .time-filter-chips {
+    gap: 8px;
+    
+    .time-chip {
+      padding: 6px 12px;
+      font-size: 12px;
+    }
+  }
+}
