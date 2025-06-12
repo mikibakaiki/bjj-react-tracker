@@ -21,8 +21,6 @@ export const getKimonos = async <T>({
     sortDirection,
   });
 
-  console.log("Query Params:", queryParams.toString());
-  console.log("URL:", url.toString());
   const response = await fetch(`${url}?${queryParams}`, {
     method: "GET",
     headers: {
