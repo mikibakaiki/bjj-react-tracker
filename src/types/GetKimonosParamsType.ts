@@ -1,9 +1,11 @@
 import { SortDirection } from "./SortDirection";
 import { TimePeriod } from "./TimePeriod";
 
-export interface FetchKimonosDto {
+export type GetKimonosParamsType = {
+  endpoint: string;
+  pageNumber: number;
   searchQuery: string;
-  pageParam: number;
   timePeriod: TimePeriod;
   sortDirection: SortDirection;
-}
+  options?: RequestInit;
+};

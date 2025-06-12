@@ -12,7 +12,7 @@ import { useInfiniteScroll } from "./hooks/useInfiniteScroll";
 
 function App() {
   const [selectedKimono, setSelectedKimono] = useState<Kimono | null>(null);
-  const [timePeriod, setTimePeriod] = useState<TimePeriod>("all");
+  const [timePeriod, setTimePeriod] = useState<TimePeriod>("today");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
 
   const {
